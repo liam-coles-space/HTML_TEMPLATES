@@ -18,7 +18,14 @@ def test_get_albums_with_id(db_connection, page, test_web_address):
     p_tag = page.locator('strong')
     expect(p_tag).to_have_text(['Release year: 1992', 'Artist: Nina Simone'])
 
-    
+def test_get_albums_on_linK(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store_extra.sql") # Seed our database with some test data
+    page.goto(f"http://{test_web_address}/albums")
+    page.click("text=Title: Thriller")
+    h1_tag = page.locator('h1')
+    expect(h1_tag).to_have_text('Thriller')
+    p_tag = page.locator('strong')
+    expect(p_tag).to_have_text(['Release year: 1982', 'Artist: ABBA'])
 
 
 """
