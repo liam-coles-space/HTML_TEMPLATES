@@ -1,11 +1,60 @@
 import os
 from flask import Flask, request, render_template
 from lib.database_connection import get_flask_database_connection
+from lib.album_repository import AlbumRepository
+from lib.album import Album
+from lib.artist import Artist
+from lib.artist_repository import ArtistRepository
 
 # Create a new Flask app
 app = Flask(__name__)
 
 # == Your Routes Here ==
+@app.route('/albums', methods = ['POST'])
+def post_albums():
+    
+    if 'title' not in request.form or 'release_year' not in request.form or 'artist_id' not in request.form:
+        return 'Please provide a album title, release year and artist ID', 400
+    connection = get_flask_database_connection(app)      
+    repository = AlbumRepository(connection)
+    repository.add(request.form['title'], request.form['release_year'], request.form['artist_id'])
+    return 'Album Added'
+
+@app.route('/albums/<id>', methods=['GET'])
+def get_albums_id(id):
+    connection = get_flask_database_connection(app)      
+    repository = AlbumRepository(connection)
+    album_and_artist = repository.find_with_artist(id)
+    album = album_and_artist[0]
+    artist = album_and_artist[1]
+    return render_template('album_with_artist.html', album=album, artist=artist)
+
+@app.route('/albums', methods=['GET'])
+def get_albums():
+    connection = get_flask_database_connection(app)      
+    repository = AlbumRepository(connection)
+    albums = repository.all()
+    return render_template('albums.html', albums=albums)
+
+
+    
+@app.route('/artists', methods=['GET'])
+def get_artists():
+    connection = get_flask_database_connection(app) 
+    repository = ArtistRepository(connection)
+    artists = str(repository.all())
+    artists = artists.replace('[','')
+    artists = artists.replace(']','')
+    return artists
+
+@app.route('/artists', methods=['POST'])
+def post_artists():
+    if 'name' not in request.form or 'genre' not in request.form:
+        return 'Please provide a name and genre', 400
+    connection = get_flask_database_connection(app) 
+    repository = ArtistRepository(connection)
+    repository.add(request.form['name'], request.form['genre'])
+    return 'Artist added'
 
 
 # == Example Code Below ==

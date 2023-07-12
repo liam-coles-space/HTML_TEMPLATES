@@ -4,6 +4,23 @@ from playwright.sync_api import Page, expect
 
 # === Example Code Below ===
 
+def test_get_albums_html(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store.sql") # Seed our database with some test data
+    page.goto(f"http://{test_web_address}/albums")
+    p_tag = page.locator("p")
+    expect(p_tag).to_have_text(['Title: Thriller','Release Year: 1982', 'Title: Back In Black', 'Release Year: 1980', 'Title: The Bodyguard', 'Release Year: 1992'])
+
+def test_get_albums_with_id(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store_extra.sql") # Seed our database with some test data
+    page.goto(f"http://{test_web_address}/albums/3")
+    h1_tag = page.locator('h1')
+    expect(h1_tag).to_have_text('The Bodyguard')
+    p_tag = page.locator('strong')
+    expect(p_tag).to_have_text(['Release year: 1992', 'Artist: Nina Simone'])
+
+    
+
+
 """
 We can get an emoji from the /emoji page
 """
