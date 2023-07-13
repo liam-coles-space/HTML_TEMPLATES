@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from lib.database_connection import get_flask_database_connection
 from lib.album_repository import AlbumRepository
 from lib.album import Album
@@ -10,15 +10,30 @@ from lib.artist_repository import ArtistRepository
 app = Flask(__name__)
 
 # == Your Routes Here ==
+
+@app.route('/albums/new', methods=['GET'])
+def get_new_album():
+    return render_template('new_album.html')
+
+
 @app.route('/albums', methods = ['POST'])
-def post_albums():
-    
-    if 'title' not in request.form or 'release_year' not in request.form or 'artist_id' not in request.form:
-        return 'Please provide a album title, release year and artist ID', 400
-    connection = get_flask_database_connection(app)      
+def create_album():
+    print('horse')
+    connection = get_flask_database_connection(app)
     repository = AlbumRepository(connection)
-    repository.add(request.form['title'], request.form['release_year'], request.form['artist_id'])
-    return 'Album Added'
+    title = request.form['title']
+    release_year = request.form['release_year']
+    artist_id = request.form['artist_id']
+    album = Album(None, title, release_year, artist_id)
+    if not album.is_valid():
+        print (album.generate_errors())
+        return render_template('new_album.html', album=album, errors=album.generate_errors()), 400
+    
+    album_id = repository.add(album.title, album.release_year, album.artist_id)
+    print('im here')
+    return redirect(f"/albums/{album_id}")
+
+    
 
 @app.route('/albums/<id>', methods=['GET'])
 def get_albums_id(id):
@@ -36,15 +51,25 @@ def get_albums():
     albums = repository.all()
     return render_template('albums.html', albums=albums)
 
+@app.route('/artists/new', methods=['GET'])
+def get_new_artist_form():
+    return render_template('new_artist.html')
 
 @app.route('/artists', methods=['POST'])
-def post_artists():
-    if 'name' not in request.form or 'genre' not in request.form:
-        return 'Please provide a name and genre', 400
+def create_artist():
     connection = get_flask_database_connection(app) 
     repository = ArtistRepository(connection)
-    repository.add(request.form['name'], request.form['genre'])
-    return 'Artist added'
+    name = request.form['name']
+    genre = request.form['genre']
+    artist = Artist(None, name, genre)
+
+    if not artist.is_valid():
+        print (artist.generate_errors())
+        return render_template('new_artist.html', artist=artist, errors=artist.generate_errors()), 400
+    
+    artist_id = repository.add(artist.name, artist.genre)
+
+    return redirect(f"/artists/{artist_id}")
 
 @app.route('/artists/<id>', methods=['GET'])
 def get_artist_by_id(id):

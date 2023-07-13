@@ -29,13 +29,15 @@ class AlbumRepository:
     #   Adds record to album table
     # Sql used:
     #   INSERT INTO albums(title, release_year, artist_id) VALUES(%s,%s,%s)
+        rows = self._connection.execute('INSERT INTO albums(title, release_year, artist_id) VALUES(%s,%s,%s) RETURNING ID', [title, release_year, artist_id])
+        print(rows)
+        row = rows[0]
+        return row['id']
 
-        self._connection.execute('INSERT INTO albums(title, release_year, artist_id) VALUES(%s,%s,%s)', [title, release_year, artist_id])
 
     
     def find_with_artist(self, id):
         rows = self._connection.execute('SELECT albums.id as album_id, title, release_year, artists.id as artist_id, name, genre from albums join artists on albums.artist_id = artists.id where albums.id = %s', [id])
-        print(rows)
         return_objects = []
         return_objects.append(Album(rows[0]['album_id'], rows[0]['title'], rows[0]['release_year'],rows[0]['artist_id']))
         return_objects.append(Artist(rows[0]['artist_id'], rows[0]['name'], rows[0]['genre']))

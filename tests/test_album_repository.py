@@ -22,7 +22,8 @@ def test_add_method(db_connection):
     db_connection.seed("seeds/music_store.sql") # Seed our database with some test data
     repository = AlbumRepository(db_connection) # Create a new BookRepository
 
-    repository.add('Silent Alarm', 2008, 784)
+    album_id = repository.add('Silent Alarm', 2008, 784)
+    assert album_id == 4
 
     albums = repository.all() # Get all books
 

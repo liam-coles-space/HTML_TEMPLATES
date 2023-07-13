@@ -18,4 +18,32 @@ def test_albums_are_equal():
     album2 = Album(1, "Test Title", 1987, 234)
     assert album1 == album2
 
+def test_album_validity():
+    assert Album(None,"","","").is_valid() == False
+    assert Album(1,"Title","","").is_valid() == False
+    assert Album(1,"Title",1998,"").is_valid() == False
+    assert Album(1,"","",2).is_valid() == False
+    assert Album(1,"",2080,2).is_valid() == False
+    assert Album(1,"Title","",2).is_valid() == False
+    assert Album(1,"",2080,"").is_valid() == False
+    assert Album(1,None,2080,"").is_valid() == False
+    assert Album(1,"Title",None,2).is_valid() == False
+    assert Album(1,"Title",2010,None).is_valid() == False
+    assert Album(1,"Title",1998,5).is_valid() == True
+    assert Album(None,"Title",1998,5).is_valid() == True
+
+def test_album_errors():
+    assert Album(None,"","","").generate_errors() == 'Title cannot be blank, Release year cannot be blank, Artist ID cannot be blank'
+    assert Album(1,"Title","","").generate_errors() == 'Release year cannot be blank, Artist ID cannot be blank'
+    assert Album(1,"Title",1998,"").generate_errors() == 'Artist ID cannot be blank'
+    assert Album(1,"","",2).generate_errors() == 'Title cannot be blank, Release year cannot be blank'
+    assert Album(1,"",2080,2).generate_errors() == 'Title cannot be blank'
+    assert Album(1,"Title","",2).generate_errors() == 'Release year cannot be blank'
+    assert Album(1,"",2080,"").generate_errors() == 'Title cannot be blank, Artist ID cannot be blank' 
+    assert Album(1,None,2080,"").generate_errors() == 'Title cannot be blank, Artist ID cannot be blank'
+    assert Album(1,"Title",None,2).generate_errors() == 'Release year cannot be blank'
+    assert Album(1,"Title",2010,None).generate_errors() == 'Artist ID cannot be blank'
+    assert Album(1,"Title",1998,5).generate_errors() == None
+    assert Album(None,"Title",1998,5).generate_errors() == None
+
 

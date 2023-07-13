@@ -18,8 +18,8 @@ def test_all_records_returned(db_connection):
 def test_add_creates_record(db_connection):
     db_connection.seed("seeds/music_store.sql") # Seed our database with some test data
     repository = ArtistRepository(db_connection) # Create a new BookRepository
-    repository.add('Bloc Party', 'Indie')
-
+    artist_id = repository.add('Bloc Party', 'Indie')
+    assert artist_id == 6
     artists = repository.all()
     assert artists == [
         Artist(1, 'Pixies', 'Grunge'),

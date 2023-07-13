@@ -2,8 +2,6 @@ from playwright.sync_api import Page, expect, Frame
 
 # Tests for your routes go here
 
-# === Example Code Below ===
-
 def test_get_albums_html(db_connection, page, test_web_address):
     db_connection.seed("seeds/music_store.sql") # Seed our database with some test data
     page.goto(f"http://{test_web_address}/albums")
@@ -45,7 +43,55 @@ def test_get_all_artists(db_connection, page, test_web_address):
     expect(h1_tag).to_have_text('Artists')
     p_tag = page.locator('p')
     expect(p_tag).to_have_text(['Pixies', 'ABBA', 'Taylor Swift', 'Nina Simone', 'Wild Nothing'])
-    
+
+def test_create_artist_with_form(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store.sql")
+    page.goto(f"http://{test_web_address}/artists")
+
+    page.click("text=Add a new Artist")
+    page.fill("input[name='name']", "The Killers")
+    page.fill("input[name='genre']", "Rock")
+    page.click("text=Create Artist")
+    expect(page).to_have_title('The Killers')
+    h1_tag = page.locator('h1')
+    expect(h1_tag).to_have_text('The Killers')
+    p_tag = page.locator('p')
+    expect(p_tag).to_have_text('Genre: Rock')
+
+def test_create_artist_error(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store.sql")
+    page.goto(f"http://{test_web_address}/artists")
+    page.goto(f"http://{test_web_address}/artists")
+
+    page.click("text=Add a new Artist")
+    page.click("text=Create Artist")
+    errors = page.locator(".t-errors")
+    expect(errors).to_have_text("There were errors with your submission: Name cant be blank, Genre cant be blank")
+
+def test_add_album_by_form(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store_extra.sql") # Seed our database with some test data
+    page.goto(f"http://{test_web_address}/albums")
+
+    page.click("text=Add a new album")
+    page.fill("input[name='title']", "test album")
+
+    page.fill("input[name='release_year']", '2007')
+    page.fill("input[name='artist_id']", '1')
+    page.click("text=Create Album")
+
+    h1_tag = page.locator('h1')
+    expect(h1_tag).to_have_text('test album')
+    strong_tag = page.locator('strong')
+    expect(strong_tag).to_have_text(['Release year: 2007', 'Artist: Pixies'])
+
+
+def test_create_album_error(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store_extra.sql") # Seed our database with some test data
+    page.goto(f"http://{test_web_address}/albums")
+    page.click("text=Add a new album")
+    page.click("text=Create Album")
+    errors = page.locator(".t-errors")
+    expect(errors).to_have_text("AThere were errors with your submission: Title cannot be blank, Release year cannot be blank, Artist ID cannot be blank")
 
 
 

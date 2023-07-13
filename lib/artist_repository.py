@@ -22,7 +22,8 @@ class ArtistRepository:
     def add(self, name, genre):
         #SQL used:
         #   INSERT INTO artists(name, genre) values(name,genre)
-        self._connection.execute('INSERT INTO artists(name, genre) values(%s,%s)', [name, genre])
+        rows = self._connection.execute('INSERT INTO artists(name, genre) values(%s,%s) RETURNING id', [name, genre])
+        return rows[0]['id']
 
     def find(self, artist_id):
         rows = self._connection.execute('SELECT id, name, genre FROM artists WHERE id = %s', [artist_id])
