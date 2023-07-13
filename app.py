@@ -37,16 +37,6 @@ def get_albums():
     return render_template('albums.html', albums=albums)
 
 
-    
-@app.route('/artists', methods=['GET'])
-def get_artists():
-    connection = get_flask_database_connection(app) 
-    repository = ArtistRepository(connection)
-    artists = str(repository.all())
-    artists = artists.replace('[','')
-    artists = artists.replace(']','')
-    return artists
-
 @app.route('/artists', methods=['POST'])
 def post_artists():
     if 'name' not in request.form or 'genre' not in request.form:
@@ -55,6 +45,20 @@ def post_artists():
     repository = ArtistRepository(connection)
     repository.add(request.form['name'], request.form['genre'])
     return 'Artist added'
+
+@app.route('/artists/<id>', methods=['GET'])
+def get_artist_by_id(id):
+    connection = get_flask_database_connection(app) 
+    repository = ArtistRepository(connection)
+    artist = repository.find(id)
+    return render_template('artist.html', artist=artist)
+
+@app.route('/artists', methods=['GET'])
+def get_all_artists():
+    connection = get_flask_database_connection(app) 
+    repository = ArtistRepository(connection)
+    artists = repository.all()
+    return render_template('artists.html', artists=artists)
 
 
 # == Example Code Below ==

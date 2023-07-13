@@ -1,4 +1,4 @@
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page, expect, Frame
 
 # Tests for your routes go here
 
@@ -26,6 +26,27 @@ def test_get_albums_on_linK(db_connection, page, test_web_address):
     expect(h1_tag).to_have_text('Thriller')
     p_tag = page.locator('strong')
     expect(p_tag).to_have_text(['Release year: 1982', 'Artist: ABBA'])
+
+def test_get_artist_with_id(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store.sql")
+    page.goto(f"http://{test_web_address}/artists/3")
+    expect(page).to_have_title('Taylor Swift')
+    h1_tag = page.locator('h1')
+    expect(h1_tag).to_have_text('Taylor Swift')
+    p_tag = page.locator('p')
+    expect(p_tag).to_have_text('Genre: Country')
+
+
+def test_get_all_artists(db_connection, page, test_web_address):
+    db_connection.seed("seeds/music_store.sql")
+    page.goto(f"http://{test_web_address}/artists")
+    expect(page).to_have_title('Artists')
+    h1_tag = page.locator('h1')
+    expect(h1_tag).to_have_text('Artists')
+    p_tag = page.locator('p')
+    expect(p_tag).to_have_text(['Pixies', 'ABBA', 'Taylor Swift', 'Nina Simone', 'Wild Nothing'])
+    
+
 
 
 """

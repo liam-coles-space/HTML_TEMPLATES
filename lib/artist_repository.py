@@ -23,3 +23,8 @@ class ArtistRepository:
         #SQL used:
         #   INSERT INTO artists(name, genre) values(name,genre)
         self._connection.execute('INSERT INTO artists(name, genre) values(%s,%s)', [name, genre])
+
+    def find(self, artist_id):
+        rows = self._connection.execute('SELECT id, name, genre FROM artists WHERE id = %s', [artist_id])
+        return Artist(rows[0]['id'], rows[0]['name'], rows[0]['genre'])
+    

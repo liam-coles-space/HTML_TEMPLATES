@@ -30,3 +30,12 @@ def test_add_creates_record(db_connection):
         Artist(6, 'Bloc Party', 'Indie'),
     ]
 
+"""
+call find artist by id
+returns artist object 
+"""
+def test_find_artist(db_connection):
+    db_connection.seed("seeds/music_store.sql") # Seed our database with some test data
+    repository = ArtistRepository(db_connection)
+    artist = repository.find(3)
+    assert artist == Artist(3, 'Taylor Swift', 'Country')
